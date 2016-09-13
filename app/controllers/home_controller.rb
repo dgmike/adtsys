@@ -7,7 +7,7 @@ class HomeController < ApplicationController
     response = Net::HTTP.post_form(uri, {})
     json = JSON.parse response.body
 
-    debugger
+    # debugger
 
     # Itera no resultado e grava as marcas que ainda não estão persistidas
     json.each do |make_params|
