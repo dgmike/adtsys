@@ -14,4 +14,10 @@ RSpec.describe "home/index.html.erb", type: :view do
     expect(rendered).to match %r{<option value="2">Marca 2</option>}
     expect(rendered).to match %r{<option value="3">Marca 3</option>}
   end
+
+  it "renders a submit buttom" do
+     render
+     
+     expect(rendered).to match %r{<input type="submit" value="Buscar modelos">}
+  end
 end
