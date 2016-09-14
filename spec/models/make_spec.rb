@@ -32,10 +32,18 @@ RSpec.describe Make, type: :model do
     expect(make.errors[:name]).to include "can't be blank"
   end
 
+  it "must validate presence of webmotors_id" do
+    make = Make.new
+
+    expect(make.valid?).to be_falsy
+    expect(make.errors.keys).to include :webmotors_id
+    expect(make.errors[:webmotors_id]).to include "can't be blank"
+  end
+
   it "throw error when duplicated" do
     Make.delete_all
-    Make.create name: "Fiat"
+    Make.create name: "Fiat", webmotors_id: 1
 
-    expect { Make.create name: "Fiat" }.to raise_error ActiveRecord::RecordNotUnique
+    expect { Make.create name: "Fiat", webmotors_id: 1 }.to raise_error ActiveRecord::RecordNotUnique
   end
 end
