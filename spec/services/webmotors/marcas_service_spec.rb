@@ -115,4 +115,14 @@ RSpec.describe Webmotors::MarcasService, type: :model do
       expect(Make.count).to eq 1
     end
   end
+
+  describe ":sync!" do
+    it "must create new self instance and call #sync! method" do
+      mock_instance = double(subject, "sync!": true)
+      expect(subject.class).to receive(:new) { mock_instance }
+
+      result = subject.class.sync!
+      expect(result).to be_truthy
+    end
+  end
 end

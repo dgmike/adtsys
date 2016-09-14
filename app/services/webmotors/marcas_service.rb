@@ -6,6 +6,10 @@ module Webmotors
     self.base_uri = "http://www.webmotors.com.br/carro/marcas"
     self.model = Make
 
+    def self.sync!
+      self.new.sync!
+    end
+
     def fetch
       response = Net::HTTP.post_form(URI(self.base_uri), {})
       JSON.parse response.body
