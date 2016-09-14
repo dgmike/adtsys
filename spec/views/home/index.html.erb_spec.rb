@@ -26,4 +26,10 @@ RSpec.describe "home/index.html.erb", type: :view do
 
      expect(rendered).to match %r{input type="submit" value="Buscar modelos"}
   end
+  
+  it "must render a label" do
+    render
+
+    expect(rendered).to match %r{<label[^>]*>Escolha a Fabricante:</label>}
+  end
 end
