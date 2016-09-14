@@ -13,16 +13,18 @@ module Webmotors
 
     def sync!
       ActiveRecord::Base.transaction do
-        fetch.each do |item|
-          begin
-            self.model.create! name: item["Nome"], webmotors_id: item["Id"]
-          rescue ActiveRecord::RecordNotUnique
-            Rails.logger.debug "Record already registered: #{item.inspect}"
-          rescue Exception => e
-            Rails.logger.debug "Resource invalid to import: #{item.inspect}. Reason: #{e.message}"
-          end
-        end
+        fetch.each { |item| create item }
       end
+    end
+
+    private
+
+    def create(item)
+      self.model.create! name: item["Nome"], webmotors_id: item["Id"]
+    rescue ActiveRecord::RecordNotUnique
+      Rails.logger.debug "Record already registered: #{item.inspect}"
+    rescue Exception => e
+      Rails.logger.debug "Resource invalid to import: #{item.inspect}. Reason: #{e.message}"
     end
   end
 end
