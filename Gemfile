@@ -38,6 +38,8 @@ end
 
 group :development do
   gem 'http_logger'
+  gem 'i18n-debug'
+  gem 'quiet_assets'
 end
 
 group :test do
