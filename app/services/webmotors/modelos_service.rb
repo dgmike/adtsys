@@ -7,12 +7,12 @@ module Webmotors
     self.cache_key = "webmotors:modelos"
 
     def fetch(webmotors_id)
-      raise ArgumentError, "invalid argument type" unless webmotors_id.to_s.match(/^\d+$/)
+      check_argument webmotors_id
       JSON.parse cached_fetch(webmotors_id)
     end
 
     def sync!(webmotors_id)
-      raise ArgumentError, "invalid argument type" unless webmotors_id.to_s.match(/^\d+$/)
+      check_argument webmotors_id
 
       make = Make.find_by webmotors_id: webmotors_id
 
@@ -22,6 +22,10 @@ module Webmotors
     end
 
     private
+
+    def check_argument(webmotors_id)
+      raise ArgumentError, "invalid argument type" unless webmotors_id.to_s.match(/^\d+$/)
+    end
 
     def cached_fetch(webmotors_id)
       Rails.cache.fetch "#{self.cache_key}:#{webmotors_id}" do
