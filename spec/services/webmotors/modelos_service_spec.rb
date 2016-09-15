@@ -42,12 +42,83 @@ RSpec.describe Webmotors::ModelosService do
   end
 
   describe "#sync!" do
-    it "must respond to :sync!"
-    it "must require one argument as numeral"
-    it "must call :fetch with argument"
-    it "must create Models based on :fetch response"
-    it "must skip duplicated results"
-    it "must log duplicated results"
-    it "must log invalid results"
+    it "must respond to :sync!" do
+      expect(subject).to respond_to :sync!
+    end
+
+    it "must require one argument as numeral" do
+      expect { subject.sync! }.to raise_error ArgumentError, "wrong number of arguments (given 0, expected 1)"
+
+      expect { subject.sync!("invalid") }.to raise_error ArgumentError, "invalid argument type"
+      expect { subject.sync!(:invalid) }.to raise_error ArgumentError, "invalid argument type"
+      expect { subject.sync!([]) }.to raise_error ArgumentError, "invalid argument type"
+      expect { subject.sync!({ type: :invalid }) }.to raise_error ArgumentError, "invalid argument type"
+    end
+
+    it "must call :fetch with argument" do
+      expect(subject).to receive(:fetch).with(1) { [] }
+
+      subject.sync! 1
+    end
+
+    it "must create Models based on :fetch response" do
+      Make.delete_all
+      Model.delete_all
+      Make.create name: "Fiat", webmotors_id: 1
+      data = [
+        { "Nome" => "Uno" },
+        { "Nome" => "Palio" }
+      ]
+      expect(subject).to receive(:fetch).with(1) { data }
+
+      subject.sync! 1
+
+      expect(Model.count).to eq(2)
+      expect(Model.first.name).to eq "Uno"
+      expect(Model.first.make).to eq Make.first
+      expect(Model.second.name).to eq "Palio"
+      expect(Model.second.make).to eq Make.first
+    end
+
+    it "must skip duplicated results" do
+      Make.delete_all
+      Model.delete_all
+      Make.create name: "Fiat", webmotors_id: 1
+      data = [
+        { "Nome" => "Uno" },
+        { "Nome" => "Palio" }
+      ]
+
+      10.times do
+        expect(subject).to receive(:fetch).with(1) { data }
+        subject.sync! 1
+      end
+
+      expect(Model.count).to eq(2)
+    end
+
+    it "must log duplicated results" do
+      Make.delete_all
+      Model.delete_all
+      make = Make.create name: "Fiat", webmotors_id: 1
+      Model.create make: make, name: "Uno"
+
+      expect(subject).to receive(:fetch).with(1) { [{"Nome" => "Uno"}] }
+      expect(Rails.logger).to receive(:debug).with("Record already registered: {\"Nome\"=>\"Uno\"}")
+
+      subject.sync! 1
+    end
+
+    it "must log invalid results" do
+      Make.delete_all
+      Model.delete_all
+      make = Make.create name: "Fiat", webmotors_id: 1
+      Model.create make: make, name: "Uno"
+
+      expect(subject).to receive(:fetch).with(1) { [{"Type" => "Invalid"}] }
+      expect(Rails.logger).to receive(:debug).with("Resource invalid to import: {\"Type\"=>\"Invalid\"}. Reason: Validation failed: Name can't be blank")
+
+      subject.sync! 1
+    end
   end
 end
