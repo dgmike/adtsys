@@ -21,6 +21,6 @@ RSpec.describe "models/index.html.erb", type: :view do
 
     render
 
-    expect(rendered).to match %r{<a href="/"[^>]*><< Voltar</a>}
+    expect(rendered).to match %r{<a href="/"[^>]*>&lt;&lt; Voltar</a>}
   end
 end
