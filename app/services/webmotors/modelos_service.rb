@@ -6,6 +6,11 @@ module Webmotors
     self.base_uri = "http://www.webmotors.com.br/carro/modelos"
     self.cache_key = "webmotors:modelos"
 
+    def self.sync!(webmotors_id)
+      raise ArgumentError, "invalid argument type" unless webmotors_id.to_s.match(/^\d+$/)
+      self.new.sync! webmotors_id unless Rails.cache.exist? "#{self.cache_key}:#{webmotors_id}"
+    end
+
     def fetch(webmotors_id)
       check_argument webmotors_id
       JSON.parse cached_fetch(webmotors_id)

@@ -135,4 +135,37 @@ RSpec.describe Webmotors::ModelosService do
       subject.sync! 1
     end
   end
+
+  describe "self.sync!" do
+    it "must respond to self.sync!" do
+      expect(Webmotors::ModelosService).to respond_to :sync!
+    end
+
+    it "must require one argument as numeral" do
+      expect { Webmotors::ModelosService.sync! }.to raise_error ArgumentError, "wrong number of arguments (given 0, expected 1)"
+
+      expect { Webmotors::ModelosService.sync!("invalid") }.to raise_error ArgumentError, "invalid argument type"
+      expect { Webmotors::ModelosService.sync!(:invalid) }.to raise_error ArgumentError, "invalid argument type"
+      expect { Webmotors::ModelosService.sync!([]) }.to raise_error ArgumentError, "invalid argument type"
+      expect { Webmotors::ModelosService.sync!({ type: :invalid }) }.to raise_error ArgumentError, "invalid argument type"
+    end
+
+    it "runs only if cache not exists" do
+      expect(Rails.cache).to receive(:exist?).with("webmotors:modelos:1") { false }
+
+      mock_object = double('modelo_service')
+      expect(mock_object).to receive :sync!
+      expect(Webmotors::ModelosService).to receive(:new) { mock_object }
+
+      Webmotors::ModelosService.sync! 1
+    end
+
+    it "do not run if exists cache" do
+      expect(Rails.cache).to receive(:exist?).with("webmotors:modelos:1") { true }
+
+      expect(Webmotors::ModelosService).not_to receive(:new)
+
+      Webmotors::ModelosService.sync! 1
+    end
+  end
 end
