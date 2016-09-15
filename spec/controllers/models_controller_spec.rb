@@ -71,5 +71,32 @@ RSpec.describe ModelsController, type: :controller do
 
       expect { get :index, webmotors_make_id: "1" }.to raise_error(ActiveRecord::RecordNotFound, "Couldn't find Make")
     end
+
+    it "must call Webmotors::ModelosService.sync! passing webmotors_make_id attribute" do
+      Make.delete_all
+      Model.delete_all
+
+      Make.create webmotors_id: 1, name: "Fiat"
+      expect(Webmotors::ModelosService).to receive(:sync!).with("1")
+
+      get :index, webmotors_make_id: "1"
+    end
+
+    it "must assign models" do
+      Make.delete_all
+      Model.delete_all
+
+      make = Make.create webmotors_id: 1, name: "Fiat"
+      models = [
+        Model.create(make: make, name: "Palio"),
+        Model.create(make: make, name: "Uno")
+      ]
+
+      expect(Webmotors::ModelosService).to receive(:sync!)
+
+      get :index, webmotors_make_id: "1"
+
+      expect(assigns :models).to eq(models)
+    end
   end
 end

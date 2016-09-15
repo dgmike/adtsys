@@ -2,6 +2,7 @@ class ModelsController < ApplicationController
   before_action :sync_models, only: [:index]
 
   def index
+    @models = Make.includes(:models).find_by!(webmotors_id: params[:webmotors_make_id]).models
   end
 
   private
