@@ -56,6 +56,8 @@ RSpec.describe Webmotors::ModelosService do
     end
 
     it "must call :fetch with argument" do
+      Make.delete_all
+      Make.create name: "Fiat", webmotors_id: 1
       expect(subject).to receive(:fetch).with(1) { [] }
 
       subject.sync! 1
@@ -117,6 +119,18 @@ RSpec.describe Webmotors::ModelosService do
 
       expect(subject).to receive(:fetch).with(1) { [{"Type" => "Invalid"}] }
       expect(Rails.logger).to receive(:debug).with("Resource invalid to import: {\"Type\"=>\"Invalid\"}. Reason: Validation failed: Name can't be blank")
+
+      subject.sync! 1
+    end
+
+    it "must raise error when Make not exists" do
+      Make.delete_all
+      expect { subject.sync! 1 }.to raise_error(ActiveRecord::RecordNotFound, "Couldn't find Make")
+    end
+
+    it "must use ActiveRecord::Base.transaction" do
+      active_record = class_double('ActiveRecord::Base').as_stubbed_const
+      expect(active_record).to receive :transaction
 
       subject.sync! 1
     end

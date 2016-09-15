@@ -14,10 +14,9 @@ module Webmotors
     def sync!(webmotors_id)
       check_argument webmotors_id
 
-      make = Make.find_by webmotors_id: webmotors_id
-
-      fetch(webmotors_id).each do |item|
-        create make, item
+      ActiveRecord::Base.transaction do
+        make = Make.find_by! webmotors_id: webmotors_id
+        fetch(webmotors_id).each { |item| create make, item }
       end
     end
 
