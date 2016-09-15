@@ -3,21 +3,27 @@ require 'rails_helper'
 RSpec.describe ModelsController, type: :controller do
   describe "GET #index" do
     it "returns http success" do
-      get :index
+      Make.delete_all
+      Make.create name: "Fiat", webmotors_id: 1
+      get :index, webmotors_make_id: "1"
       expect(response).to have_http_status(:success)
     end
 
     it "must call WebMotors Api" do
+      Make.delete_all
+      Make.create name: "Fiat", webmotors_id: 1
       http = class_double("Net::HTTP").as_stubbed_const
 
       uri = URI("http://www.webmotors.com.br/carro/modelos")
       mock_response = double(:http, body: "[]")
-      expect(http).to receive(:post_form).with(uri, marca: nil) { mock_response }
+      expect(http).to receive(:post_form).with(uri, marca: "1") { mock_response }
 
-      get :index
+      get :index, webmotors_make_id: "1"
     end
 
     it "must call WebMotors Api repassing argument" do
+      Make.delete_all
+      Make.create name: "Fiat", webmotors_id: 1
       http = class_double("Net::HTTP").as_stubbed_const
 
       uri = URI("http://www.webmotors.com.br/carro/modelos")
@@ -63,12 +69,7 @@ RSpec.describe ModelsController, type: :controller do
       Make.delete_all
       Model.delete_all
 
-      http = class_double("Net::HTTP").as_stubbed_const
-      uri = URI("http://www.webmotors.com.br/carro/modelos")
-      mock_response = double(:http, body: '[{"Nome":"Uno"},{"Nome":"Palio"}]')
-      expect(http).to receive(:post_form).with(uri, marca: "1") { mock_response }
-
-      expect { get :index, webmotors_make_id: "1" }.to raise_error("undefined method `id' for nil:NilClass")
+      expect { get :index, webmotors_make_id: "1" }.to raise_error(ActiveRecord::RecordNotFound, "Couldn't find Make")
     end
   end
 end

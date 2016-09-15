@@ -35,7 +35,7 @@ RSpec.describe Webmotors::ModelosService do
 
       uri = URI("http://www.webmotors.com.br/carro/modelos")
       mock_response = double(:http, body: '[]')
-      expect(http).to receive(:post_form).with(uri, { webmotors_id: "1" }) { mock_response }
+      expect(http).to receive(:post_form).with(uri, { marca: "1" }) { mock_response }
 
       expect(subject.fetch "1").to eq []
     end

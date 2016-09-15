@@ -33,7 +33,7 @@ module Webmotors
 
     def cached_fetch(webmotors_id)
       Rails.cache.fetch "#{self.cache_key}:#{webmotors_id}" do
-        response = Net::HTTP.post_form URI(self.base_uri), { webmotors_id: webmotors_id }
+        response = Net::HTTP.post_form URI(self.base_uri), { marca: webmotors_id }
         response.body
       end
     end
