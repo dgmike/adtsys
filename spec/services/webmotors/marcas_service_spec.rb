@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Webmotors::MarcasService, type: :model do
+RSpec.describe Webmotors::MarcasService do
   describe "#fetch" do
     it "must respond to :fetch" do
       expect(subject).to respond_to :fetch
